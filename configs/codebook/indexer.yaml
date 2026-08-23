@@ -1,0 +1,14 @@
+defaults:
+  - defaults
+
+name: indexer
+contact_grid: 16
+pred_cam: true
+contact_map: true
+video_feats: 768
+text_feats: true
+batch_size: 512
+decoder_only: true
+setting: tasks
+only_first: true
+load_indices: codebook

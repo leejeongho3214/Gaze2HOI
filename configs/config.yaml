@@ -1,0 +1,36 @@
+hydra:
+  run:
+    dir: .          # 실행 디렉터리 바꾸지 않음
+  sweep:
+    dir: .          # 멀티런도 현재 폴더
+    subdir: .       # 하위 폴더 만들지 않음
+  output_subdir: null
+  job:
+    chdir: false    # 작업 디렉터리 변경 금지
+
+defaults:
+  - _self_
+  - dataset: hot3d
+  - clip: clip
+  - diffusion: diffusion
+  - mpnet: mpnet
+  - seq_cvae: seq_cvae
+  - pointfeat: pointfeat
+  - contact: contact
+  - gaze2hoi: gaze2hoi
+  - refiner: refiner
+  - codebook: codebook
+  - override hydra/job_logging: disabled
+  - override hydra/hydra_logging: disabled
+
+batch_size: 64  # 64, 512
+shuffle: True
+drop_last: True
+num_workers: 4
+result_show_freq: 500
+save_pth_freq: 2000
+text: ["hook handle of Mug_white with right hand"]
+balance_weights: True
+test: False
+reset: False
+use_best_weight: False 

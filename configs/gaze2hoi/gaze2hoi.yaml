@@ -1,0 +1,109 @@
+model:
+  # Gaze2HOI architecture
+  latent_dim: 512
+  ff_size: 1024
+  num_layers: 8
+  num_heads: 4
+  dropout: 0.1
+  activation: gelu
+  cond_mask_prob: 0.1
+  use_cond_fc: True
+  use_frame_pos: True
+
+  # Object/gaze condition used by the current training setup.
+  object_feature_type: bps # bps, pointnet
+  # Match BimArt/DiffH2O: retain the full nearest-point displacement (dx,dy,dz)
+  # for every basis point instead of discarding direction via its scalar norm.
+  object_bps_feature_mode: displacement # distance, displacement
+  # GAGE ablations:
+  # gage_alignment_temporal: directional alignment only, temporal CGIA
+  # gage_closeness_temporal: ray closeness only, temporal CGIA
+  # gage_averaged_tokens: average both cues over valid frames and append two
+  # sequence-level tokens after the 300 motion tokens (fusion auto-set to append)
+  gaze_condition_mode: bps_ray_alignment_tokens_temporal
+  # Direct object-relative gaze encoding ablation (used with
+  # gaze_condition_mode=relative_gaze_mlp).
+  relative_gaze_sequence_length: 100
+  relative_gaze_feat_dim: 128
+  relative_gaze_hidden_dim: 256
+  relative_gaze_dropout: 0.1
+  # Null-gaze ablation: preserve the gaze branch and its parameter count, but
+  # replace every gaze-derived condition with zeros during both train and test.
+  null_gaze_condition: False
+  gaze_token_fusion: cross_attn # add, film, token, cross_attn, append
+  # hand_object: Gaze -> Hand -> Object
+  # object_hand: Gaze -> Object -> Hand
+  # parallel: Gaze -> {Hand, Object}, with no dependency between the two updates
+  cross_attn_order: hand_object
+  gaze_alignment_temporal_scope: all # all, until_contact
+
+  # Point-token output target.
+  output_representation: point # point, pose
+  point_token_count: 100
+  canonicalize_point_targets: True
+  predict_object_pose: True # hybrid: hand point tokens + relative 9D object pose
+  use_obj_scale: True # append only object scale to the global condition
+  use_obj_centroid: False # keep centroid out of the model condition
+  motion_normalization_min_std: 0.0001
+
+exp:
+  # The displacement condition is 3,072-D and is incompatible with the older
+  # 1,024-D distance checkpoint, so train it under a separate experiment path.
+  name: gaze2hoi
+  # Exact optimizer-update budget. Logs and checkpoints use this iteration.
+  iteration: 100000
+  seed: 0
+  num_test_seeds: 10
+  deterministic: False
+  validation_ratio: 0.1
+  validation_batch_size: 64
+  # Set automatically by scripts/evaluate_iterations.py when scoring
+  # the held-out train split with the official task metrics.
+  eval_dataset_indices_path: null
+  log_iteration_freq: 100
+  latest_checkpoint_freq: 1000
+  checkpoint_freq: 10000
+  # Keep every 10k milestone until official metric evaluation selects the best.
+  keep_last_checkpoints: 0
+  use_amp: True
+  grad_clip_norm: 1.0
+  ema_decay: 0.9999
+  use_ema_for_eval: True
+  warmup_iterations: 2000
+  min_lr_ratio: 0.0
+  # Test-only gaze corruption: none, rotation, translation, or frame_hold.
+  gaze_noise_mode: none
+  gaze_rotation_std_deg: 2.0
+  gaze_translation_std_m: 0.005
+  gaze_frame_hold_interval: 5
+  lr: 0.0001
+
+  lambda_simple: 1.0
+  lambda_obj_trans: 1.0
+  lambda_obj_rot: 0.1
+
+  save_root: outputs/gaze2hoi/${gaze2hoi.exp.name}
+  # Training prefers latest_model.pth. Set resume_path only for an explicit
+  # warm start. weight_path remains an inference/evaluation-only setting.
+  resume_path: null
+  weight_path: outputs/gaze2hoi/${gaze2hoi.exp.name}/best_metric_model.pth
+  save_name: False
+  # Official DiffH2O/GRAB object basis: bps.pt["obj"] has 1,024 points.
+  # load_bps_basis rescales its ~0.15 radius to the canonical unit sphere.
+  bps_path: assets/grab_bps_1024.pt
+  hand_index_path: assets/part_fps_hand_index_100.npy
+  precompute_bps_correspondence: True
+  bps_correspondence_source: object_mesh # normalized_obj_pc, object_mesh
+  mano_fit_use_post_opt_losses: True
+  # Post-adjustment schedule. Set to ``uniform20_legacy`` only when comparing
+  # against the earlier uniform-last-20-frame implementation.
+  mano_refine_mode: contact_ramp
+  # Test-time MANO fitting iterations. Selected by the fitting sweep.
+  mano_fit_iters: 100
+  # Post-opt starts at each hand's first predicted contact and runs through the
+  # valid sequence end. If no contact exists, only the final 10 valid frames
+  # are refined with an explicit hand-object contact attraction loss.
+  mano_refine_contact_weight: 100.0
+  mano_refine_contact_threshold: 0.02
+  mano_refine_fallback_contact_frames: 10
+  mano_refine_transition_frames: 5

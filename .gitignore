@@ -1,0 +1,24 @@
+# data and model weights are not redistributed with this repository
+data/
+checkpoints/
+outputs/
+cache/
+wandb/
+result_pkl/
+result_md/
+reports/
+eval/data/
+eval/models/
+eval/outputs/
+
+*.pth
+*.pkl
+*.rrd
+*.npz
+
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+.env
+.DS_Store

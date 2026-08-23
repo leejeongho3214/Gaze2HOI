@@ -1,0 +1,18 @@
+model_name: contact_estimator
+name: grab_exc_two_obj
+latent_dim: 64
+cond_dim: 1601
+use_scale: True
+use_gaze_map: True
+use_dice_loss: True
+decoder_layer_dims: [512, 256, 128, 1]
+final_sigmoid: True
+in_dim: 4
+test_iteration: 1
+iteration: 100000
+lr: 0.0001
+epoch: None
+save_root: outputs/${contact.model_name}
+weight_path: checkpoints/${dataset.name}/${contact.model_name}_best_e${contact.epoch}.pth
+rot_obj: True
+aug_rot: True

@@ -1,0 +1,32 @@
+# Core
+torch>=2.0
+numpy
+scipy
+pyyaml
+easydict
+tqdm
+
+# Configuration
+hydra-core>=1.3
+omegaconf
+
+# Geometry / meshes
+trimesh
+smplx
+open3d
+opencv-python
+
+# Text encoders (prompt-conditioned baselines and dataset text features)
+git+https://github.com/openai/CLIP.git
+sentence-transformers
+
+# Logging and analysis
+wandb
+pandas
+matplotlib
+
+# Visualization (optional)
+rerun-sdk==0.23.2
+
+# pytorch3d must be installed separately, see:
+# https://github.com/facebookresearch/pytorch3d/blob/main/INSTALL.md

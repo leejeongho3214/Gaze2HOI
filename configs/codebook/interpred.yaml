@@ -1,0 +1,18 @@
+defaults:
+  - defaults
+
+name: interpred
+motion_type: mano
+code_dim: 512
+nb_code: 512
+contact_grid: 16
+contact_dim: 16
+pred_cam: true
+contact_map: true
+video_feats: 768
+text_feats: true
+decoder_only: true
+only_first: true
+load_prior: indexer
+setting: tasks
+load_indices: codebook

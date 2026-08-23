@@ -1,0 +1,11 @@
+model_name: seq_cvae
+name: grab_ori
+latent_dim: 64
+cond_dim: 512
+encoder_layer_dims: [1, 512] 
+decoder_layer_dims: [512, 1] 
+final_sigmoid: True
+iteration: 1000
+lr: 0.001
+save_root: outputs/${seq_cvae.model_name}/${seq_cvae.name}
+weight_path: outputs/${seq_cvae.model_name}/${seq_cvae.name}/best_model.pth

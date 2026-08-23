@@ -1,0 +1,24 @@
+name: "hot3d"
+root: "data/hot3d"
+obj_root: "data/hot3d/object_mesh"
+bps_obj_source: "object_mesh"
+mesh_part_bbox_margin: 0.03
+data_root : "data/hot3d/dataset"
+data_name: "ori_dataset/gaze_train"
+data_obj_pc_path: "data/hot3d/dataset/obj.pkl"
+
+balance_weights_path: "data/hot3d/balance_weights.pkl"
+text_json: "data/hot3d/text.json"
+t2l_json: "data/hot3d/text_length.json"
+t2c_json: "data/hot3d/text_count.json"
+flat_hand: False
+max_nframes: 99
+data_ratio: 1
+augm: False
+data_num: 916
+text_num: 118
+exclude_obj: False
+use_afford_map: False
+
+
+
